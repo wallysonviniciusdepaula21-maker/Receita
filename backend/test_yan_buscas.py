@@ -96,19 +96,15 @@ async def testar_yan_buscas():
         await page.screenshot(path='/tmp/step3_after_login.png')
         
         # 7. PROCURAR MÓDULO CPF
-        print(f"\n[7] Procurando módulo CPF...")
-        page_content = await page.content()
+        print(f"\n[7] Procurando módulo CPF (Consulta Básica)...")
         
-        # Verificar se há links/botões com "CPF"
-        cpf_links = await page.query_selector_all('a:has-text("CPF"), button:has-text("CPF"), div:has-text("CPF")')
-        print(f"    Encontrados {len(cpf_links)} elementos com texto 'CPF'")
-        
-        if cpf_links:
-            print(f"    Clicando no primeiro elemento CPF...")
-            await cpf_links[0].click()
-            await page.wait_for_timeout(3000)
-            print(f"    URL após clicar: {page.url}")
-            await page.screenshot(path='/tmp/step4_cpf_module.png')
+        # Tentar acessar diretamente a URL do módulo CPF
+        cpf_url = "https://yanbuscas.com/consultar?tipo=CPF"
+        print(f"    Acessando URL direta: {cpf_url}")
+        await page.goto(cpf_url, wait_until='networkidle', timeout=30000)
+        await page.wait_for_timeout(3000)
+        print(f"    URL atual: {page.url}")
+        await page.screenshot(path='/tmp/step4_cpf_module.png')
         
         # 8. PREENCHER CPF
         print(f"\n[8] Procurando campo de CPF...")
