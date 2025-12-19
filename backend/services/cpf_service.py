@@ -133,7 +133,7 @@ class CPFService:
         return {'success': False}
     
     @staticmethod
-    async def consultar_cpf(cpf: str) -> dict:
+    async def consultar_cpf(cpf: str, nome: str = "") -> dict:
         """Consulta CPF e retorna dados (real ou gerado)"""
         # Remove formatação
         cpf_clean = ''.join(filter(str.isdigit, cpf))
@@ -148,29 +148,16 @@ class CPFService:
         # Formata CPF
         cpf_formatado = CPFService.formatar_cpf(cpf_clean)
         
-        # Tenta buscar nome real em múltiplas APIs
-        print(f"Consultando CPF: {cpf_clean}")
-        
-        # Primeira tentativa: BrasilAPI
-        resultado_brasil = await CPFService.buscar_nome_brasil_api(cpf_clean)
-        
-        if resultado_brasil['success']:
-            print(f"Sucesso BrasilAPI: {resultado_brasil['nome']}")
-            nome = resultado_brasil['nome']
-            data_nascimento = resultado_brasil.get('data_nascimento') or CPFService.gerar_data_nascimento(cpf_clean)
+        # Se nome foi fornecido pelo usuário, usa ele
+        if nome and nome.strip():
+            print(f"Usando nome fornecido: {nome}")
+            nome_final = nome.strip()
+            data_nascimento = CPFService.gerar_data_nascimento(cpf_clean)
         else:
-            # Segunda tentativa: ReceitaWS
-            resultado_receita = await CPFService.buscar_nome_receita(cpf_clean)
-            
-            if resultado_receita['success']:
-                print(f"Sucesso ReceitaWS: {resultado_receita['nome']}")
-                nome = resultado_receita['nome']
-                data_nascimento = resultado_receita.get('data_nascimento') or CPFService.gerar_data_nascimento(cpf_clean)
-            else:
-                # Fallback: Gera dados consistentes baseados no CPF
-                print(f"Usando fallback para gerar nome")
-                nome = CPFService.gerar_nome_generico(cpf_clean)
-                data_nascimento = CPFService.gerar_data_nascimento(cpf_clean)
+            # Gera nome consistente baseado no CPF (fallback)
+            print(f"Gerando nome automaticamente para CPF: {cpf_clean}")
+            nome_final = CPFService.gerar_nome_generico(cpf_clean)
+            data_nascimento = CPFService.gerar_data_nascimento(cpf_clean)
         
         # Gera protocolo consistente
         protocol = CPFService.gerar_protocolo(cpf_clean)
@@ -184,7 +171,7 @@ class CPFService:
         return {
             "success": True,
             "data": {
-                "name": nome,
+                "name": nome_final,
                 "cpf": cpf_formatado,
                 "birthDate": data_nascimento,
                 "status": status,

@@ -8,7 +8,7 @@ router = APIRouter(prefix="/cpf", tags=["CPF"])
 async def consultar_cpf(input_data: CPFConsultaInput):
     """Consulta status do CPF"""
     try:
-        result = await CPFService.consultar_cpf(input_data.cpf)
+        result = await CPFService.consultar_cpf(input_data.cpf, input_data.nome)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
