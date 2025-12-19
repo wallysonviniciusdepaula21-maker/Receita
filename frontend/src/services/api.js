@@ -18,8 +18,8 @@ export const darfService = {
 };
 
 export const pixService = {
-  gerar: async (protocol, value, cpf) => {
-    const response = await axios.post(`${API}/pix/gerar`, { protocol, value, cpf });
+  gerar: async (protocol, value, cpf, nome = '') => {
+    const response = await axios.post(`${API}/pix/gerar`, { protocol, value, cpf, nome });
     return response.data;
   },
   verificar: async (protocol) => {
