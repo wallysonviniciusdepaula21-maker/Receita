@@ -1,47 +1,46 @@
 from models.darf import DARFData
-import random
+import hashlib
 
 class DARFService:
+    # Valores fixos conforme solicitado
+    VALOR_PRINCIPAL = 98.44
+    MULTA = 35.28
+    JUROS = 17.70
+    VALOR_TOTAL = 149.42
+    
+    @staticmethod
+    def extrair_nome_protocolo(protocol: str) -> str:
+        """Extrai nome do contribuinte baseado no protocolo"""
+        # Em produção, isso buscaria no banco de dados
+        # Por enquanto, retorna nome genérico
+        return "Contribuinte"
+    
+    @staticmethod
+    def extrair_cpf_protocolo(protocol: str) -> str:
+        """Extrai CPF baseado no protocolo"""
+        # Em produção, buscaria no banco
+        return "000.000.000-00"
+    
     @staticmethod
     async def gerar_darf(protocol: str) -> dict:
-        # Valores fixos para o protocolo conhecido
-        if protocol == "CTP9513859":
-            return {
-                "success": True,
-                "data": {
-                    "protocolo": protocol,
-                    "contribuinte": "Natanael Sales Pantoja",
-                    "cpf": "012.302.462-58",
-                    "periodoApuracao": "18/11/2024",
-                    "dataVencimento": "20/12/2025",
-                    "codigoReceita": "8045",
-                    "numeroReferencia": protocol,
-                    "valorPrincipal": 98.44,
-                    "multa": 35.28,
-                    "juros": 17.70,
-                    "valorTotal": 149.42
-                }
-            }
+        """Gera DARF com valores fixos para qualquer protocolo"""
         
-        # Gera valores aleatórios para outros protocolos
-        valor_principal = round(random.uniform(50, 500), 2)
-        multa = round(valor_principal * 0.35, 2)
-        juros = round(valor_principal * 0.18, 2)
-        valor_total = round(valor_principal + multa + juros, 2)
+        # Busca dados do CPF salvos em memória ou banco
+        # Por simplicidade, vamos retornar valores fixos
         
         return {
             "success": True,
             "data": {
                 "protocolo": protocol,
-                "contribuinte": "Contribuinte Teste",
-                "cpf": "000.000.000-00",
-                "periodoApuracao": "01/01/2024",
-                "dataVencimento": "31/12/2025",
+                "contribuinte": "Contribuinte",  # Será preenchido pelo frontend com dados salvos
+                "cpf": "000.000.000-00",  # Será preenchido pelo frontend
+                "periodoApuracao": "18/11/2024",
+                "dataVencimento": "20/12/2025",
                 "codigoReceita": "8045",
                 "numeroReferencia": protocol,
-                "valorPrincipal": valor_principal,
-                "multa": multa,
-                "juros": juros,
-                "valorTotal": valor_total
+                "valorPrincipal": DARFService.VALOR_PRINCIPAL,
+                "multa": DARFService.MULTA,
+                "juros": DARFService.JUROS,
+                "valorTotal": DARFService.VALOR_TOTAL
             }
         }
