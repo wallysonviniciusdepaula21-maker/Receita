@@ -108,12 +108,25 @@ async def testar_yan_buscas():
         
         # 8. PREENCHER CPF
         print(f"\n[8] Procurando campo de CPF...")
-        cpf_inputs = await page.query_selector_all('input[placeholder*="CPF" i], input[name*="cpf" i]')
-        print(f"    Encontrados {len(cpf_inputs)} campos de CPF")
         
-        if cpf_inputs:
-            print(f"    Preenchendo CPF: {cpf}")
-            await cpf_inputs[0].fill(cpf)
+        # Tentar múltiplos seletores
+        all_inputs = await page.query_selector_all('input')
+        print(f"    Encontrados {len(all_inputs)} campos input na página")
+        
+        for i, inp in enumerate(all_inputs):
+            input_type = await inp.get_attribute('type')
+            input_name = await inp.get_attribute('name')
+            input_placeholder = await inp.get_attribute('placeholder')
+            input_id = await inp.get_attribute('id')
+            print(f"    Input {i}: type={input_type}, name={input_name}, id={input_id}, placeholder={input_placeholder}")
+        
+        # Tentar preencher o primeiro input de texto
+        text_inputs = await page.query_selector_all('input[type="text"], input:not([type])')
+        
+        if text_inputs:
+            print(f"    Preenchendo CPF no primeiro campo de texto: {cpf}")
+            await text_inputs[0].fill(cpf)
+            await page.wait_for_timeout(1000)
             await page.screenshot(path='/tmp/step5_cpf_filled.png')
             
             # 9. CLICAR EM CONSULTAR
