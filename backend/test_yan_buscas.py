@@ -7,7 +7,7 @@ import os
 async def testar_yan_buscas():
     cpf = "10362198950"
     username = "joapedrs"
-    password = "ip1012"
+    password = "jp1012"  # Senha correta
     
     print(f"[TESTE] Iniciando teste com CPF: {cpf}")
     
