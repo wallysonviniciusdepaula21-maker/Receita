@@ -13,7 +13,7 @@ async def testar_yan_buscas():
     
     playwright = await async_playwright().start()
     browser = await playwright.chromium.launch(
-        headless=False,  # Não headless para vermos o que acontece
+        headless=True,  # Headless porque não temos display
         args=['--no-sandbox', '--disable-setuid-sandbox']
     )
     
