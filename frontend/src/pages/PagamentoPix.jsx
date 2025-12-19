@@ -1,19 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Clock, Copy, FileText, Check, AlertCircle } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import GovBrHeader from '../components/GovBrHeader';
 import { useToast } from '../hooks/use-toast';
 import { Toaster } from '../components/ui/toaster';
+import { pixService } from '../services/api';
 
 const PagamentoPix = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const [paymentData, setPaymentData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState({
     hours: 14,
     minutes: 29,
     seconds: 45
   });
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const generatePix = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (!userData) {
+          navigate('/');
+          return;
+        }
+
+        const result = await pixService.gerar(userData.protocol, 149.42, userData.cpf);
+        if (result.success) {
+          setPaymentData({
+            name: userData.name,
+            cpf: userData.cpf,
+            protocol: userData.protocol,
+            value: 149.42,
+            dueDate: userData.deadline,
+            status: result.data.status,
+            pixCode: result.data.pixCode,
+            qrCodeUrl: result.data.qrCodeUrl
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao gerar PIX:', error);
+        toast({
+          title: \"Erro\",
+          description: \"Erro ao gerar PIX. Tente novamente.\",
+          variant: \"destructive\"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    generatePix();
+  }, [navigate, toast]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,15 +80,28 @@ const PagamentoPix = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const paymentData = {
-    name: 'Natanael Sales Pantoja',
-    cpf: '012.302.462-58',
-    protocol: 'CTP9513859',
-    value: 149.42,
-    dueDate: '20/12/2025',
-    status: 'Pendente',
-    pixCode: '00020101021226940014br.gov.bcb.pix01257sercode.hypermall.eip.com.br/qrpix/v2/4c7b20f96-8a96-42dc-9d85-eca3a174cf3e52040000530398654149.425802BR5925RECEITA FEDERAL DO BRA6009Sao Paulo62070503***6304D6A3'
-  };
+  // Verificar pagamento a cada 30 segundos
+  useEffect(() => {
+    if (!paymentData) return;
+
+    const checkPayment = async () => {
+      try {
+        const result = await pixService.verificar(paymentData.protocol);
+        if (result.success && result.data.status === 'PAGO') {
+          toast({
+            title: \"✅ Pagamento Confirmado!\",
+            description: \"Seu pagamento foi processado com sucesso.\",
+          });
+          setPaymentData(prev => ({ ...prev, status: 'PAGO' }));
+        }
+      } catch (error) {
+        console.error('Erro ao verificar pagamento:', error);
+      }
+    };
+
+    const interval = setInterval(checkPayment, 30000);
+    return () => clearInterval(interval);
+  }, [paymentData, toast]);
 
   const handleCopyPix = () => {
     navigator.clipboard.writeText(paymentData.pixCode);
