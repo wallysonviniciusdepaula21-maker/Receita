@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -6,6 +7,7 @@ import { Card, CardContent } from './ui/card';
 
 const LoginCard = () => {
   const [cpf, setCpf] = useState('');
+  const navigate = useNavigate();
 
   const formatCPF = (value) => {
     const numbers = value.replace(/\D/g, '');
@@ -25,8 +27,8 @@ const LoginCard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('CPF digitado:', cpf);
-    // Aqui iria a lógica de autenticação
+    // Navegar para a página de loading
+    navigate('/loading');
   };
 
   return (
