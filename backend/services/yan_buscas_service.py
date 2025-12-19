@@ -40,14 +40,14 @@ class YanBuscasService:
             await self.page.goto(self.url_login, wait_until='networkidle', timeout=30000)
             
             # Preenche credenciais
-            await self.page.fill('input[name="username"], input[type="text"]', self.username)
-            await self.page.fill('input[name="password"], input[type="password"]', self.password)
+            await self.page.fill('input[name="username"]', self.username)
+            await self.page.fill('input[name="password"]', self.password)
             
             # Clica no botão de login
-            await self.page.click('button[type="submit"], button:has-text("Entrar"), button:has-text("Login")')
+            await self.page.click('button[type="submit"]')
             
-            # Aguarda redirecionamento para dashboard
-            await self.page.wait_for_url('**/dashboard**', timeout=15000)
+            # Aguarda redirecionamento para home (não dashboard)
+            await self.page.wait_for_url('**/home**', timeout=30000)
             
             print("[YanBuscas] Login realizado com sucesso!")
             self.logged_in = True
