@@ -22,7 +22,12 @@ const Darf = () => {
 
         const result = await darfService.obter(userData.protocol);
         if (result.success) {
-          setDarfData(result.data);
+          // Mescla dados da API com dados do usuário
+          setDarfData({
+            ...result.data,
+            contribuinte: userData.name,
+            cpf: userData.cpf
+          });
         }
       } catch (error) {
         console.error('Erro ao buscar DARF:', error);
