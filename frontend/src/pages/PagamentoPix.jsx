@@ -29,7 +29,7 @@ const PagamentoPix = () => {
           return;
         }
 
-        const result = await pixService.gerar(userData.protocol, 149.42, userData.cpf);
+        const result = await pixService.gerar(userData.protocol, 149.42, userData.cpf, userData.name);
         if (result.success) {
           setPaymentData({
             name: userData.name,
