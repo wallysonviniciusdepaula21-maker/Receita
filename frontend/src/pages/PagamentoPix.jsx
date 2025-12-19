@@ -45,9 +45,9 @@ const PagamentoPix = () => {
       } catch (error) {
         console.error('Erro ao gerar PIX:', error);
         toast({
-          title: \"Erro\",
-          description: \"Erro ao gerar PIX. Tente novamente.\",
-          variant: \"destructive\"
+          title: "Erro",
+          description: "Erro ao gerar PIX. Tente novamente.",
+          variant: "destructive"
         });
       } finally {
         setLoading(false);
@@ -89,8 +89,8 @@ const PagamentoPix = () => {
         const result = await pixService.verificar(paymentData.protocol);
         if (result.success && result.data.status === 'PAGO') {
           toast({
-            title: \"✅ Pagamento Confirmado!\",
-            description: \"Seu pagamento foi processado com sucesso.\",
+            title: "✅ Pagamento Confirmado!",
+            description: "Seu pagamento foi processado com sucesso.",
           });
           setPaymentData(prev => ({ ...prev, status: 'PAGO' }));
         }
@@ -104,13 +104,22 @@ const PagamentoPix = () => {
   }, [paymentData, toast]);
 
   const handleCopyPix = () => {
-    navigator.clipboard.writeText(paymentData.pixCode);
-    setCopied(true);
-    toast({
-      title: "Código PIX copiado!",
-      description: "Cole no aplicativo do seu banco para pagar.",
+    if (!paymentData) return;
+    
+    navigator.clipboard.writeText(paymentData.pixCode).then(() => {
+      setCopied(true);
+      toast({
+        title: "Código PIX copiado!",
+        description: "Cole no aplicativo do seu banco para pagar.",
+      });
+      setTimeout(() => setCopied(false), 3000);
+    }).catch(() => {
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar o código. Tente manualmente.",
+        variant: "destructive"
+      });
     });
-    setTimeout(() => setCopied(false), 3000);
   };
 
   const formatCurrency = (value) => {
@@ -119,6 +128,14 @@ const PagamentoPix = () => {
       currency: 'BRL'
     }).format(value);
   };
+
+  if (loading || !paymentData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50">
@@ -184,7 +201,7 @@ const PagamentoPix = () => {
             <div className="flex justify-center mb-6">
               <div className="bg-white p-4 rounded-lg border-4 border-blue-600 shadow-lg">
                 <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=00020101021226940014br.gov.bcb.pix"
+                  src={paymentData.qrCodeUrl}
                   alt="QR Code PIX"
                   className="w-64 h-64"
                 />
@@ -268,7 +285,7 @@ const PagamentoPix = () => {
           Verificação automática a cada 30 segundos
         </p>
         <p className="text-center text-xs text-gray-500 mt-1">
-          Última verificação: 15:14:59
+          Última verificação: {new Date().toLocaleTimeString('pt-BR')}
         </p>
       </main>
       <Toaster />
