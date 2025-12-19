@@ -9,6 +9,13 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
 from datetime import datetime, timezone
+import sys
+
+# Add backend directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+# Import routes
+from routes import cpf_routes, darf_routes, pix_routes
 
 
 ROOT_DIR = Path(__file__).parent
@@ -65,6 +72,11 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+# Include custom routes
+api_router.include_router(cpf_routes.router)
+api_router.include_router(darf_routes.router)
+api_router.include_router(pix_routes.router)
 
 # Include the router in the main app
 app.include_router(api_router)
