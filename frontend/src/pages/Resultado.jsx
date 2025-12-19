@@ -37,7 +37,7 @@ const Resultado = () => {
   }, []);
 
   const handleRegularizar = () => {
-    navigate('/loading-pagamento');
+    navigate('/darf');
   };
 
   const userData = {
