@@ -2,65 +2,112 @@ from models.pix import PixPayment
 from datetime import datetime, timedelta
 import random
 import string
+from services.furia_pay_service import furia_pay_service
 
 class PixService:
     # Armazena pagamentos em memória (em produção seria no banco)
     payments = {}
     
     @staticmethod
-    def generate_pix_code(protocol: str, value: float) -> str:
-        """Gera um código PIX simulado"""
-        # Código PIX simplificado (em produção seria gerado por API bancária)
-        base = f"00020101021226940014br.gov.bcb.pix01257sercode.hypermall.eip.com.br/qrpix/v2/{protocol}"
-        value_str = f"5802BR5925RECEITA FEDERAL DO BRA6009Sao Paulo62070503***"
-        checksum = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        return f"{base}52040000530398654{value}{value_str}6304{checksum}"
-    
-    @staticmethod
-    async def gerar_pix(protocol: str, value: float, cpf: str) -> dict:
-        """Gera um pagamento PIX"""
-        pix_code = PixService.generate_pix_code(protocol, value)
-        qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={pix_code[:100]}"
-        expires_at = datetime.utcnow() + timedelta(hours=24)
+    async def gerar_pix(protocol: str, value: float, cpf: str, nome: str = "") -> dict:
+        """
+        Gera um pagamento PIX usando Furia Pay
         
-        payment = {
-            "protocol": protocol,
-            "cpf": cpf,
-            "value": value,
-            "pixCode": pix_code,
-            "qrCodeUrl": qr_code_url,
-            "status": "PENDENTE",
-            "expiresAt": expires_at.isoformat()
-        }
-        
-        # Salva em memória
-        PixService.payments[protocol] = payment
-        
-        return {
-            "success": True,
-            "data": payment
-        }
+        Args:
+            protocol: Protocolo da transação
+            value: Valor em reais
+            cpf: CPF do pagador
+            nome: Nome do pagador (opcional)
+        """
+        try:
+            print(f"[PixService] Gerando PIX via Furia Pay - Valor: R$ {value:.2f}")
+            
+            # Se não tem nome, usa genérico
+            if not nome:
+                nome = "Contribuinte"
+            
+            # Cria transação no Furia Pay
+            resultado = furia_pay_service.criar_transacao_pix(
+                valor=value,
+                cpf=cpf,
+                nome=nome,
+                protocol=protocol
+            )
+            
+            if resultado['success']:
+                # Salva dados em memória
+                payment_data = {
+                    'protocol': protocol,
+                    'cpf': cpf,
+                    'value': value,
+                    'pixCode': resultado['pix_code'],
+                    'qrCodeUrl': resultado.get('qr_code_url', ''),
+                    'qrCodeBase64': resultado.get('qr_code_base64', ''),
+                    'transactionId': resultado['transaction_id'],
+                    'status': 'PENDENTE',
+                    'expiresAt': resultado.get('expires_at')
+                }
+                
+                PixService.payments[protocol] = payment_data
+                
+                print(f"[PixService] ✓ PIX gerado com sucesso - Transaction ID: {resultado['transaction_id']}")
+                
+                return {
+                    'success': True,
+                    'data': payment_data
+                }
+            else:
+                print(f"[PixService] ✗ Erro ao gerar PIX: {resultado.get('error')}")
+                return {
+                    'success': False,
+                    'error': resultado.get('error', 'Erro ao gerar PIX')
+                }
+                
+        except Exception as e:
+            print(f"[PixService] ✗ Exceção ao gerar PIX: {e}")
+            return {
+                'success': False,
+                'error': f'Erro ao processar pagamento: {str(e)}'
+            }
     
     @staticmethod
     async def verificar_pagamento(protocol: str) -> dict:
-        """Verifica status do pagamento PIX"""
-        payment = PixService.payments.get(protocol)
-        
-        if not payment:
+        """
+        Verifica status do pagamento PIX consultando Furia Pay
+        """
+        try:
+            payment = PixService.payments.get(protocol)
+            
+            if not payment:
+                return {
+                    'success': False,
+                    'message': 'Pagamento não encontrado'
+                }
+            
+            # Consulta status no Furia Pay
+            transaction_id = payment.get('transactionId')
+            resultado = furia_pay_service.buscar_transacao(transaction_id)
+            
+            if resultado['success']:
+                # Atualiza status
+                if resultado['paid']:
+                    payment['status'] = 'PAGO'
+                    payment['paidAt'] = resultado['paid_at']
+                    print(f"[PixService] ✓ Pagamento confirmado! Protocolo: {protocol}")
+                
+                return {
+                    'success': True,
+                    'data': {
+                        'status': payment['status'],
+                        'paidAt': payment.get('paidAt')
+                    }
+                }
+            else:
+                return resultado
+                
+        except Exception as e:
+            print(f"[PixService] Erro ao verificar pagamento: {e}")
             return {
-                "success": False,
-                "message": "Pagamento não encontrado"
+                'success': False,
+                'error': str(e)
             }
-        
-        # Simula pagamento aleatório (5% de chance de estar pago)
-        if payment["status"] == "PENDENTE" and random.random() < 0.05:
-            payment["status"] = "PAGO"
-            payment["paidAt"] = datetime.utcnow().isoformat()
-        
-        return {
-            "success": True,
-            "data": {
-                "status": payment["status"],
-                "paidAt": payment.get("paidAt")
-            }
-        }
