@@ -17,4 +17,3 @@ class CPFData(BaseModel):
 
 class CPFConsultaInput(BaseModel):
     cpf: str
-    nome: str = ""  # Nome opcional - se vazio, gera automaticamente
