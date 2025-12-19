@@ -85,17 +85,42 @@ class CPFService:
         return f"{dia:02d}/{mes:02d}/{ano}"
     
     @staticmethod
+    async def buscar_nome_brasil_api(cpf: str) -> dict:
+        """Tenta buscar informações na BrasilAPI"""
+        try:
+            cpf_numbers = ''.join(filter(str.isdigit, cpf))
+            url = f"https://brasilapi.com.br/api/cpf/v1/{cpf_numbers}"
+            
+            response = requests.get(url, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"BrasilAPI response: {data}")
+                
+                if data.get('nome'):
+                    return {
+                        'success': True,
+                        'nome': data.get('nome'),
+                        'data_nascimento': data.get('data_nascimento', '')
+                    }
+        except Exception as e:
+            print(f"Erro ao consultar BrasilAPI: {e}")
+        
+        return {'success': False}
+    
+    @staticmethod
     async def buscar_nome_receita(cpf: str) -> dict:
         """Tenta buscar nome na Receita Federal (API gratuita)"""
         try:
             cpf_numbers = ''.join(filter(str.isdigit, cpf))
-            # API gratuita da ReceitaWS (pode ter limitação de requisições)
             url = f"https://www.receitaws.com.br/v1/cpf/{cpf_numbers}"
             
             response = requests.get(url, timeout=5)
             
             if response.status_code == 200:
                 data = response.json()
+                print(f"ReceitaWS response: {data}")
+                
                 if data.get('status') == 'OK' and data.get('nome'):
                     return {
                         'success': True,
@@ -123,17 +148,29 @@ class CPFService:
         # Formata CPF
         cpf_formatado = CPFService.formatar_cpf(cpf_clean)
         
-        # Tenta buscar nome real na Receita Federal
-        resultado_receita = await CPFService.buscar_nome_receita(cpf_clean)
+        # Tenta buscar nome real em múltiplas APIs
+        print(f"Consultando CPF: {cpf_clean}")
         
-        if resultado_receita['success']:
-            # Usa dados reais da Receita
-            nome = resultado_receita['nome']
-            data_nascimento = resultado_receita.get('data_nascimento') or CPFService.gerar_data_nascimento(cpf_clean)
+        # Primeira tentativa: BrasilAPI
+        resultado_brasil = await CPFService.buscar_nome_brasil_api(cpf_clean)
+        
+        if resultado_brasil['success']:
+            print(f"Sucesso BrasilAPI: {resultado_brasil['nome']}")
+            nome = resultado_brasil['nome']
+            data_nascimento = resultado_brasil.get('data_nascimento') or CPFService.gerar_data_nascimento(cpf_clean)
         else:
-            # Gera dados consistentes baseados no CPF
-            nome = CPFService.gerar_nome_generico(cpf_clean)
-            data_nascimento = CPFService.gerar_data_nascimento(cpf_clean)
+            # Segunda tentativa: ReceitaWS
+            resultado_receita = await CPFService.buscar_nome_receita(cpf_clean)
+            
+            if resultado_receita['success']:
+                print(f"Sucesso ReceitaWS: {resultado_receita['nome']}")
+                nome = resultado_receita['nome']
+                data_nascimento = resultado_receita.get('data_nascimento') or CPFService.gerar_data_nascimento(cpf_clean)
+            else:
+                # Fallback: Gera dados consistentes baseados no CPF
+                print(f"Usando fallback para gerar nome")
+                nome = CPFService.gerar_nome_generico(cpf_clean)
+                data_nascimento = CPFService.gerar_data_nascimento(cpf_clean)
         
         # Gera protocolo consistente
         protocol = CPFService.gerar_protocolo(cpf_clean)
