@@ -1,26 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, AlertTriangle, Download, Printer } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import GovBrHeader from '../components/GovBrHeader';
+import { darfService } from '../services/api';
 
 const Darf = () => {
   const navigate = useNavigate();
+  const [darfData, setDarfData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const darfData = {
-    protocolo: 'CTP9513859',
-    contribuinte: 'Natanael Sales Pantoja',
-    cpf: '012.302.462-58',
-    periodoApuracao: '18/11/2024',
-    dataVencimento: '20/12/2025',
-    codigoReceita: '8045',
-    numeroReferencia: 'CTP9513859',
-    valorPrincipal: 98.44,
-    multa: 35.28,
-    juros: 17.70,
-    valorTotal: 149.42
-  };
+  useEffect(() => {
+    const fetchDarf = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (!userData) {
+          navigate('/');
+          return;
+        }
+
+        const result = await darfService.obter(userData.protocol);
+        if (result.success) {
+          setDarfData(result.data);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar DARF:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDarf();
+  }, [navigate]);
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -32,6 +44,12 @@ const Darf = () => {
   const handleGerarDarf = () => {
     navigate('/loading-pix');
   };
+
+  if (loading || !darfData) {
+    return <div className=\"min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 flex items-center justify-center\">
+      <div className=\"animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600\" />
+    </div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50">
