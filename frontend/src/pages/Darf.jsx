@@ -1,10 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileText, AlertTriangle, Download, Printer } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import GovBrHeader from '../components/GovBrHeader';
 
 const Darf = () => {
+  const navigate = useNavigate();
+
   const darfData = {
     protocolo: 'CTP9513859',
     contribuinte: 'Natanael Sales Pantoja',
@@ -24,6 +27,10 @@ const Darf = () => {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
+  };
+
+  const handleGerarDarf = () => {
+    navigate('/loading-pix');
   };
 
   return (
@@ -139,6 +146,7 @@ const Darf = () => {
         {/* Botões de Ação */}
         <div className="grid grid-cols-1 gap-4">
           <Button
+            onClick={handleGerarDarf}
             className="w-full h-16 text-xl font-bold rounded-xl shadow-lg bg-gradient-to-r from-green-600 via-green-500 to-blue-500 hover:from-green-700 hover:via-green-600 hover:to-blue-600 text-white transition-all duration-300 transform hover:scale-105"
           >
             <FileText className="w-6 h-6 mr-3" />

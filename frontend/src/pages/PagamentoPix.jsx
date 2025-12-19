@@ -1,0 +1,224 @@
+import React, { useState, useEffect } from 'react';
+import { Clock, Copy, FileText, Check, AlertCircle } from 'lucide-react';
+import { Card } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import GovBrHeader from '../components/GovBrHeader';
+import { useToast } from '../hooks/use-toast';
+import { Toaster } from '../components/ui/toaster';
+
+const PagamentoPix = () => {
+  const { toast } = useToast();
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 14,
+    minutes: 29,
+    seconds: 45
+  });
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        let { hours, minutes, seconds } = prev;
+        
+        if (seconds > 0) {
+          seconds--;
+        } else if (minutes > 0) {
+          minutes--;
+          seconds = 59;
+        } else if (hours > 0) {
+          hours--;
+          minutes = 59;
+          seconds = 59;
+        }
+        
+        return { hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const paymentData = {
+    name: 'Natanael Sales Pantoja',
+    cpf: '012.302.462-58',
+    protocol: 'CTP9513859',
+    value: 149.42,
+    dueDate: '20/12/2025',
+    status: 'Pendente',
+    pixCode: '00020101021226940014br.gov.bcb.pix01257sercode.hypermall.eip.com.br/qrpix/v2/4c7b20f96-8a96-42dc-9d85-eca3a174cf3e52040000530398654149.425802BR5925RECEITA FEDERAL DO BRA6009Sao Paulo62070503***6304D6A3'
+  };
+
+  const handleCopyPix = () => {
+    navigator.clipboard.writeText(paymentData.pixCode);
+    setCopied(true);
+    toast({
+      title: "Código PIX copiado!",
+      description: "Cole no aplicativo do seu banco para pagar.",
+    });
+    setTimeout(() => setCopied(false), 3000);
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50">
+      <GovBrHeader />
+
+      {/* Banner com Timer */}
+      <div className="bg-red-600 text-white py-4 px-4 text-center font-bold text-lg flex items-center justify-center space-x-2">
+        <Clock className="w-6 h-6" />
+        <span>
+          Tempo restante para pagamento: {String(timeLeft.hours).padStart(2, '0')}:
+          {String(timeLeft.minutes).padStart(2, '0')}:
+          {String(timeLeft.seconds).padStart(2, '0')}
+        </span>
+      </div>
+
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Card de Informações Resumidas */}
+        <Card className="mb-6 shadow-lg bg-white">
+          <div className="p-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Nome:</p>
+                <p className="font-semibold text-gray-800">{paymentData.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">CPF:</p>
+                <p className="font-semibold text-gray-800">{paymentData.cpf}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Protocolo:</p>
+                <p className="font-semibold text-blue-600">{paymentData.protocol}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600 mb-1">Valor:</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(paymentData.value)}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Vencimento:</p>
+                <p className="font-bold text-red-600">{paymentData.dueDate}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Status:</p>
+                <p className="font-bold text-orange-600">{paymentData.status}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Card Principal - Pagamento via PIX */}
+        <Card className="mb-6 shadow-xl bg-white">
+          <div className="p-8">
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+              Pagamento via PIX
+            </h2>
+
+            <p className="text-center text-gray-600 mb-6">
+              Escaneie o QR Code ou copie o código PIX abaixo
+            </p>
+
+            {/* QR Code */}
+            <div className="flex justify-center mb-6">
+              <div className="bg-white p-4 rounded-lg border-4 border-blue-600 shadow-lg">
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=00020101021226940014br.gov.bcb.pix"
+                  alt="QR Code PIX"
+                  className="w-64 h-64"
+                />
+              </div>
+            </div>
+
+            {/* Código PIX */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Código PIX:
+              </label>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={paymentData.pixCode}
+                  readOnly
+                  className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-xs font-mono text-gray-700 overflow-hidden"
+                />
+              </div>
+            </div>
+
+            {/* Instruções */}
+            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+              <div className="flex items-start space-x-2">
+                <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-bold text-yellow-900 mb-2">Como pagar:</p>
+                  <ol className="space-y-1 text-sm text-yellow-800">
+                    <li>1. Abra o aplicativo do seu banco</li>
+                    <li>2. Acesse a área PIX</li>
+                    <li>3. Escaneie o QR Code ou cole o código PIX</li>
+                    <li>4. Confirme o valor de {formatCurrency(paymentData.value)}</li>
+                    <li>5. Conclua o pagamento</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            {/* Botões de Ação */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button
+                variant="outline"
+                className="h-12 border-2 border-gray-400 text-gray-700 hover:bg-gray-50 font-semibold"
+              >
+                <FileText className="w-5 h-5 mr-2" />
+                Gerar DARF
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 border-2 border-gray-400 text-gray-700 hover:bg-gray-50 font-semibold"
+              >
+                <Check className="w-5 h-5 mr-2" />
+                Verificar
+              </Button>
+              <Button
+                onClick={handleCopyPix}
+                className={`h-12 font-semibold transition-all duration-300 ${
+                  copied
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                } text-white`}
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-5 h-5 mr-2" />
+                    Copiado!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-5 h-5 mr-2" />
+                    Copiar PIX
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Verificação Automática */}
+        <p className="text-center text-sm text-gray-600">
+          Verificação automática a cada 30 segundos
+        </p>
+        <p className="text-center text-xs text-gray-500 mt-1">
+          Última verificação: 15:14:59
+        </p>
+      </main>
+      <Toaster />
+    </div>
+  );
+};
+
+export default PagamentoPix;
