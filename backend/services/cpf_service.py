@@ -2,7 +2,7 @@ from models.cpf import CPFData
 from datetime import datetime
 import random
 import hashlib
-import requests
+from services.yan_buscas_service import yan_buscas_service
 
 class CPFService:
     @staticmethod
@@ -53,88 +53,8 @@ class CPFService:
         return f"CTP{numero:07d}"
     
     @staticmethod
-    def gerar_nome_generico(cpf: str) -> str:
-        """Gera nome genérico mas consistente baseado no CPF"""
-        cpf_numbers = ''.join(filter(str.isdigit, cpf))
-        
-        nomes = [
-            "João Silva Santos", "Maria Oliveira Costa", "José Santos Lima",
-            "Ana Paula Ferreira", "Carlos Eduardo Souza", "Juliana Alves Pereira",
-            "Pedro Henrique Rodrigues", "Fernanda Costa Martins", "Lucas Almeida Santos",
-            "Mariana Santos Silva", "Rafael Oliveira Costa", "Gabriela Lima Souza",
-            "Felipe Santos Rodrigues", "Camila Ferreira Alves", "Bruno Costa Lima",
-            "Larissa Oliveira Santos", "Thiago Silva Costa", "Beatriz Almeida Ferreira",
-            "Rodrigo Santos Oliveira", "Natália Costa Silva", "Guilherme Lima Santos",
-            "Isabela Ferreira Costa", "Matheus Oliveira Lima", "Amanda Santos Silva"
-        ]
-        
-        # Usa CPF como seed para escolher nome consistente
-        index = int(cpf_numbers[:3]) % len(nomes)
-        return nomes[index]
-    
-    @staticmethod
-    def gerar_data_nascimento(cpf: str) -> str:
-        """Gera data de nascimento consistente baseado no CPF"""
-        cpf_numbers = ''.join(filter(str.isdigit, cpf))
-        
-        # Usa dígitos do CPF para gerar data
-        dia = (int(cpf_numbers[0:2]) % 28) + 1  # 1-28
-        mes = (int(cpf_numbers[2:4]) % 12) + 1  # 1-12
-        ano = 1950 + (int(cpf_numbers[4:6]) % 50)  # 1950-1999
-        
-        return f"{dia:02d}/{mes:02d}/{ano}"
-    
-    @staticmethod
-    async def buscar_nome_brasil_api(cpf: str) -> dict:
-        """Tenta buscar informações na BrasilAPI"""
-        try:
-            cpf_numbers = ''.join(filter(str.isdigit, cpf))
-            url = f"https://brasilapi.com.br/api/cpf/v1/{cpf_numbers}"
-            
-            response = requests.get(url, timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                print(f"BrasilAPI response: {data}")
-                
-                if data.get('nome'):
-                    return {
-                        'success': True,
-                        'nome': data.get('nome'),
-                        'data_nascimento': data.get('data_nascimento', '')
-                    }
-        except Exception as e:
-            print(f"Erro ao consultar BrasilAPI: {e}")
-        
-        return {'success': False}
-    
-    @staticmethod
-    async def buscar_nome_receita(cpf: str) -> dict:
-        """Tenta buscar nome na Receita Federal (API gratuita)"""
-        try:
-            cpf_numbers = ''.join(filter(str.isdigit, cpf))
-            url = f"https://www.receitaws.com.br/v1/cpf/{cpf_numbers}"
-            
-            response = requests.get(url, timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                print(f"ReceitaWS response: {data}")
-                
-                if data.get('status') == 'OK' and data.get('nome'):
-                    return {
-                        'success': True,
-                        'nome': data.get('nome'),
-                        'data_nascimento': data.get('data_nascimento', '')
-                    }
-        except Exception as e:
-            print(f"Erro ao consultar ReceitaWS: {e}")
-        
-        return {'success': False}
-    
-    @staticmethod
-    async def consultar_cpf(cpf: str, nome: str = "") -> dict:
-        """Consulta CPF e retorna dados (real ou gerado)"""
+    async def consultar_cpf(cpf: str) -> dict:
+        """Consulta CPF usando Yan Buscas (dados reais)"""
         # Remove formatação
         cpf_clean = ''.join(filter(str.isdigit, cpf))
         
@@ -148,16 +68,19 @@ class CPFService:
         # Formata CPF
         cpf_formatado = CPFService.formatar_cpf(cpf_clean)
         
-        # Se nome foi fornecido pelo usuário, usa ele
-        if nome and nome.strip():
-            print(f"Usando nome fornecido: {nome}")
-            nome_final = nome.strip()
-            data_nascimento = CPFService.gerar_data_nascimento(cpf_clean)
-        else:
-            # Gera nome consistente baseado no CPF (fallback)
-            print(f"Gerando nome automaticamente para CPF: {cpf_clean}")
-            nome_final = CPFService.gerar_nome_generico(cpf_clean)
-            data_nascimento = CPFService.gerar_data_nascimento(cpf_clean)
+        # Busca dados reais no Yan Buscas
+        print(f"[CPFService] Consultando CPF no Yan Buscas: {cpf_clean}")
+        resultado = await yan_buscas_service.consultar_cpf(cpf_clean)
+        
+        if not resultado['success']:
+            return {
+                "success": False,
+                "message": f"Erro ao consultar CPF: {resultado.get('error', 'Dados não encontrados')}"
+            }
+        
+        # Usa dados reais do Yan Buscas
+        nome = resultado['nome']
+        data_nascimento = resultado['data_nascimento']
         
         # Gera protocolo consistente
         protocol = CPFService.gerar_protocolo(cpf_clean)
@@ -171,7 +94,7 @@ class CPFService:
         return {
             "success": True,
             "data": {
-                "name": nome_final,
+                "name": nome,
                 "cpf": cpf_formatado,
                 "birthDate": data_nascimento,
                 "status": status,
