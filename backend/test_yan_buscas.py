@@ -87,6 +87,12 @@ async def testar_yan_buscas():
         current_url = page.url
         print(f"    URL atual: {current_url}")
         
+        # Verificar se houve erro de login
+        page_text = await page.evaluate('() => document.body.innerText')
+        if 'incorreto' in page_text.lower() or 'inválido' in page_text.lower() or 'erro' in page_text.lower():
+            print(f"    ⚠ POSSÍVEL ERRO DE LOGIN detectado")
+            print(f"    Mensagem: {page_text[:500]}")
+        
         await page.screenshot(path='/tmp/step3_after_login.png')
         
         # 7. PROCURAR MÓDULO CPF
