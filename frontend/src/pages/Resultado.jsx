@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Calendar, MapPin, FileText, AlertTriangle, XCircle, Clock, ShieldAlert } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import GovBrHeader from '../components/GovBrHeader';
 
 const Resultado = () => {
+  const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState({
     hours: 8,
     minutes: 57,
@@ -33,6 +35,10 @@ const Resultado = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  const handleRegularizar = () => {
+    navigate('/loading-pagamento');
+  };
 
   const userData = {
     name: 'Natanael Sales Pantoja',
@@ -226,6 +232,7 @@ const Resultado = () => {
 
         {/* Botão de Regularização */}
         <Button
+          onClick={handleRegularizar}
           className="w-full h-16 text-xl font-bold rounded-xl shadow-lg bg-gradient-to-r from-green-600 via-green-500 to-blue-500 hover:from-green-700 hover:via-green-600 hover:to-blue-600 text-white transition-all duration-300 transform hover:scale-105"
         >
           <ShieldAlert className="w-6 h-6 mr-3" />

@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Loading from './pages/Loading';
 import Resultado from './pages/Resultado';
+import LoadingPagamento from './pages/LoadingPagamento';
+import Darf from './pages/Darf';
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/loading" element={<Loading />} />
           <Route path="/resultado" element={<Resultado />} />
+          <Route path="/loading-pagamento" element={<LoadingPagamento />} />
+          <Route path="/darf" element={<Darf />} />
         </Routes>
       </BrowserRouter>
     </div>
