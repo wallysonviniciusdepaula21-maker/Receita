@@ -10,7 +10,7 @@ class YanBuscasService:
     def __init__(self):
         self.url_login = "https://yanbuscas.com/login"
         self.username = os.environ.get('YANBUSCAS_USER', 'joapedrs')
-        self.password = os.environ.get('YANBUSCAS_PASS', 'ip1012')
+        self.password = os.environ.get('YANBUSCAS_PASS', 'jp1012')  # Senha correta
         self.browser: Optional[Browser] = None
         self.page: Optional[Page] = None
         self.logged_in = False
@@ -65,69 +65,54 @@ class YanBuscasService:
             cpf_clean = ''.join(filter(str.isdigit, cpf))
             print(f"[YanBuscas] Consultando CPF: {cpf_clean}")
             
-            # Navega para o módulo CPF (Consulta básica)
-            # Procura pelo card/botão "CPF" ou "Consulta básica"
-            await self.page.goto('https://yanbuscas.com/dashboard', wait_until='networkidle')
-            
-            # Clica no módulo CPF
-            await self.page.click('a:has-text("CPF"), button:has-text("CPF"), div:has-text("CPF")')
+            # Navega diretamente para o módulo CPF
+            cpf_url = "https://yanbuscas.com/consultar?tipo=CPF"
+            await self.page.goto(cpf_url, wait_until='networkidle', timeout=30000)
             await self.page.wait_for_timeout(2000)
             
-            # Preenche o CPF
-            await self.page.fill('input[placeholder*="CPF"], input[name*="cpf"]', cpf_clean)
+            # Preenche o CPF no campo de texto
+            await self.page.fill('input[type="text"]', cpf_clean)
+            await self.page.wait_for_timeout(1000)
             
             # Clica em Consultar
-            await self.page.click('button:has-text("Consultar"), button:has-text("Buscar")')
+            await self.page.click('button:has-text("Consultar")')
             
-            # Aguarda resultado
-            await self.page.wait_for_timeout(3000)
+            # Aguarda resultado (pode demorar)
+            await self.page.wait_for_timeout(5000)
             
-            # Extrai NOME e DATA DE NASCIMENTO do resultado
-            # Procura por elementos que contenham "NOME:" e "NASCIMENTO:"
-            page_content = await self.page.content()
+            # Extrai o texto visível da página
+            page_text = await self.page.evaluate('() => document.body.innerText')
+            
+            # Extrai NOME e DATA DE NASCIMENTO usando regex
+            import re
             
             nome = None
             data_nascimento = None
             
-            # Tenta extrair usando diferentes seletores
-            try:
-                # Método 1: Procurar por texto específico
-                nome_element = await self.page.query_selector('text=NOME:')
-                if nome_element:
-                    parent = await nome_element.evaluate('el => el.parentElement.innerText')
-                    nome = parent.replace('NOME:', '').strip()
-                
-                nasc_element = await self.page.query_selector('text=NASCIMENTO:')
-                if nasc_element:
-                    parent = await nasc_element.evaluate('el => el.parentElement.innerText')
-                    data_nascimento = parent.replace('NASCIMENTO:', '').strip()
-            except:
-                pass
+            # Buscar NOME (formato: "NOME: XXXXX")
+            nome_match = re.search(r'NOME:\s*([A-Z\s]+?)(?:\n|CPF:)', page_text)
+            if nome_match:
+                nome = nome_match.group(1).strip()
             
-            # Método 2: Regex no conteúdo da página
-            if not nome:
-                import re
-                nome_match = re.search(r'NOME[:\s]+([A-Z\s]+)', page_content)
-                if nome_match:
-                    nome = nome_match.group(1).strip()
-                
-                nasc_match = re.search(r'NASCIMENTO[:\s]+(\d{2}/\d{2}/\d{4})', page_content)
-                if nasc_match:
-                    data_nascimento = nasc_match.group(1).strip()
+            # Buscar NASCIMENTO (formato: "NASCIMENTO: DD/MM/YYYY")
+            nasc_match = re.search(r'NASCIMENTO:\s*(\d{2}/\d{2}/\d{4})', page_text)
+            if nasc_match:
+                data_nascimento = nasc_match.group(1).strip()
             
             if nome and data_nascimento:
-                print(f"[YanBuscas] Dados encontrados - Nome: {nome}, Nasc: {data_nascimento}")
+                print(f"[YanBuscas] ✓ Dados encontrados - Nome: {nome}, Nasc: {data_nascimento}")
                 return {
                     'success': True,
                     'nome': nome,
                     'data_nascimento': data_nascimento
                 }
             else:
-                print(f"[YanBuscas] Dados não encontrados na página")
-                return {'success': False, 'error': 'Dados não encontrados'}
+                print(f"[YanBuscas] ⚠ Dados não encontrados")
+                print(f"[YanBuscas] Texto da página: {page_text[:500]}")
+                return {'success': False, 'error': 'Dados não encontrados no resultado'}
                 
         except Exception as e:
-            print(f"[YanBuscas] Erro ao consultar CPF: {e}")
+            print(f"[YanBuscas] ✗ Erro ao consultar CPF: {e}")
             return {'success': False, 'error': str(e)}
     
     async def fechar(self):
