@@ -36,7 +36,7 @@ const LoginCard = () => {
     if (!cpf || cpf.length < 14) {
       toast({
         title: "Erro",
-        description: "Por favor, digite um CPF válido",
+        description: "Por favor, digite um CPF válido com 11 dígitos",
         variant: "destructive"
       });
       return;
@@ -54,8 +54,8 @@ const LoginCard = () => {
         navigate('/loading');
       } else {
         toast({
-          title: "Erro",
-          description: "CPF não encontrado",
+          title: "CPF Inválido",
+          description: result.message || "O CPF digitado não é válido. Verifique os dígitos.",
           variant: "destructive"
         });
       }
@@ -63,7 +63,7 @@ const LoginCard = () => {
       console.error('Erro ao consultar CPF:', error);
       toast({
         title: "Erro",
-        description: "Erro ao consultar CPF. Tente novamente.",
+        description: "Erro ao consultar CPF. Verifique sua conexão e tente novamente.",
         variant: "destructive"
       });
     } finally {
