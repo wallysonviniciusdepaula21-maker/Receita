@@ -10,6 +10,7 @@ import { Toaster } from './ui/toaster';
 
 const LoginCard = () => {
   const [cpf, setCpf] = useState('');
+  const [nome, setNome] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -44,8 +45,8 @@ const LoginCard = () => {
 
     setLoading(true);
     try {
-      // Consultar CPF na API
-      const result = await cpfService.consultar(cpf);
+      // Consultar CPF na API (com nome opcional)
+      const result = await cpfService.consultar(cpf, nome);
       
       if (result.success) {
         // Salvar dados no localStorage
@@ -109,6 +110,24 @@ const LoginCard = () => {
 
           {/* Formulário */}
           <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-2">
+                Nome Completo (opcional)
+              </label>
+              <Input
+                id="nome"
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Digite seu nome completo"
+                className="w-full h-12 text-base"
+                disabled={loading}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Se deixar em branco, geraremos um nome automaticamente
+              </p>
+            </div>
+
             <div className="mb-6">
               <label htmlFor="cpf" className="block text-sm font-medium text-gray-700 mb-2">
                 Digite seu CPF para acessar

@@ -4,8 +4,8 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export const cpfService = {
-  consultar: async (cpf) => {
-    const response = await axios.post(`${API}/cpf/consultar`, { cpf });
+  consultar: async (cpf, nome = '') => {
+    const response = await axios.post(`${API}/cpf/consultar`, { cpf, nome });
     return response.data;
   }
 };
