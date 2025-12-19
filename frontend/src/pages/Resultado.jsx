@@ -7,11 +7,22 @@ import GovBrHeader from '../components/GovBrHeader';
 
 const Resultado = () => {
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
   const [timeLeft, setTimeLeft] = useState({
     hours: 8,
     minutes: 57,
     seconds: 34
   });
+
+  useEffect(() => {
+    // Buscar dados do localStorage
+    const data = localStorage.getItem('userData');
+    if (data) {
+      setUserData(JSON.parse(data));
+    } else {
+      navigate('/');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -40,16 +51,11 @@ const Resultado = () => {
     navigate('/darf');
   };
 
-  const userData = {
-    name: 'Natanael Sales Pantoja',
-    cpf: '012.302.462-58',
-    birthDate: '24/09/1975',
-    status: 'IRREGULAR',
-    declaration2023: 'NÃO ENTREGUE',
-    protocol: 'CTP9513859',
-    deadline: '20/12/2025',
-    statusType: 'CRÍTICO'
-  };
+  if (!userData) {
+    return <div className=\"min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 flex items-center justify-center\">
+      <div className=\"animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600\" />
+    </div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50">
