@@ -1,6 +1,7 @@
 from models.darf import DARFData
 from datetime import datetime, timedelta
 import hashlib
+import random
 
 class DARFService:
     # Valores fixos conforme solicitado
