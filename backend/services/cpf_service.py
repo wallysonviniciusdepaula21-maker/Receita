@@ -3,6 +3,13 @@ from datetime import datetime, timedelta
 import random
 import hashlib
 from services.yan_buscas_service import yan_buscas_service
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
+
+# Conexão MongoDB para cache
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+mongo_client = AsyncIOMotorClient(mongo_url)
+mongo_db = mongo_client[os.environ.get('DB_NAME', 'test_database')]
 
 class CPFService:
     @staticmethod
