@@ -3,14 +3,21 @@ import base64
 import os
 from typing import Dict
 import uuid
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente do .env
+load_dotenv()
 
 class FuriaPayService:
     """Serviço para integração com Furia Pay BR"""
     
     def __init__(self):
         self.base_url = "https://api.furiapaybr.com/v1"
-        self.public_key = os.environ.get('FURIAPAY_PUBLIC_KEY', 'pk_WBBsU+2XK5_X6dyNIaeG_ZB04NcmlIRXRTwvLYg96R7CPyL')
-        self.secret_key = os.environ.get('FURIAPAY_SECRET_KEY', 'CHAVE_SECRETA_AQUI')  # CONFIGURAR NO .ENV
+        self.public_key = os.getenv('FURIAPAY_PUBLIC_KEY')
+        self.secret_key = os.getenv('FURIAPAY_SECRET_KEY')
+        
+        if not self.public_key or not self.secret_key:
+            raise ValueError("Chaves do Furia Pay não configuradas no .env")
         
         # Cria autenticação Basic
         credentials = f"{self.public_key}:{self.secret_key}"
