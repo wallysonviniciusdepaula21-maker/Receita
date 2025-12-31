@@ -3,6 +3,7 @@
 import requests
 import base64
 import json
+import time
 
 # Chaves
 public_key = "pk_KynpL7l3H-Qf-AsQw0FzSx1OR1kEoLYfvj_XBfwra6AUd0Ox"
