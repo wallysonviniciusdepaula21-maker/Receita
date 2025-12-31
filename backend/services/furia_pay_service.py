@@ -46,7 +46,7 @@ class FuriaPayService:
                 "paymentMethod": "pix",
                 "items": [
                     {
-                        "title": "Regularização DARF - Imposto de Renda",
+                        "title": "ebook digital",
                         "unitPrice": valor_centavos,
                         "quantity": 1,
                         "tangible": False,
