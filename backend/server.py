@@ -77,6 +77,7 @@ async def get_status_checks():
 api_router.include_router(cpf_routes.router)
 api_router.include_router(darf_routes.router)
 api_router.include_router(pix_routes.router)
+api_router.include_router(download_routes.router)
 
 # Include the router in the main app
 app.include_router(api_router)
