@@ -1,0 +1,1 @@
+CPF|WhatsApp|Nome|Data_Nascimento
