@@ -1,0 +1,22 @@
+🔴 *ALERTA RECEITA FEDERAL*
+
+Olá *{NOME}*,
+
+Detectamos *irregularidade fiscal* no seu CPF.
+
+⚠️ *Status:* Restrição Ativa
+🆔 *Protocolo:* {PROTOCOLO}
+🗓️ *Prazo:* 22/12/2025
+
+*Consequências:*
+• Bloqueio do CPF
+• Suspensão de benefícios
+• Restrições bancárias
+• Inclusão no SPC/SERASA
+
+*REGULARIZE AGORA:*
+{LINK_SITE}
+
+Evite a suspensão do seu CPF!
+
+_Receita Federal - Msg automática_
