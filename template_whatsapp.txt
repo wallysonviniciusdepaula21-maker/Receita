@@ -2,7 +2,7 @@
 
 Prezado(a) *{NOME}*,
 
-Informamos que foi detectada uma *irregularidade fiscal* relacionada ao seu Cadastro de Pessoa Física (CPF) junto à Receita Federal do Brasil.
+Informamos que foi detectada uma *irregularidade fiscal* relacionada ao seu Cadastro de Pessoa Física (CPF *{CPF}*) junto à Receita Federal do Brasil.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 

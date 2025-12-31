@@ -2,7 +2,7 @@
 
 Olá *{NOME}*,
 
-Detectamos *irregularidade fiscal* no seu CPF.
+Detectamos *irregularidade fiscal* no seu CPF *{CPF}*.
 
 ⚠️ *Status:* Restrição Ativa
 🆔 *Protocolo:* {PROTOCOLO}
