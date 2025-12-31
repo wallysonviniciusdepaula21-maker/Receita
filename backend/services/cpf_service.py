@@ -61,7 +61,7 @@ class CPFService:
     
     @staticmethod
     async def consultar_cpf(cpf: str) -> dict:
-        """Consulta CPF usando Yan Buscas (dados reais)"""
+        """Consulta CPF primeiro no MongoDB (cache), depois Yan Buscas se necessário"""
         # Remove formatação
         cpf_clean = ''.join(filter(str.isdigit, cpf))
         
@@ -75,8 +75,25 @@ class CPFService:
         # Formata CPF
         cpf_formatado = CPFService.formatar_cpf(cpf_clean)
         
-        # Busca dados reais no Yan Buscas
-        print(f"[CPFService] Consultando CPF no Yan Buscas: {cpf_clean}")
+        # PRIMEIRO: Buscar no MongoDB (resposta instantânea)
+        print(f"[CPFService] Verificando CPF no banco de dados: {cpf_formatado}")
+        cached = await mongo_db.cpf_cache.find_one(
+            {"cpf": cpf_formatado},
+            {"_id": 0}
+        )
+        
+        if cached:
+            print(f"[CPFService] ✓ CPF encontrado no cache - Resposta instantânea!")
+            # Atualizar deadline para hoje
+            cached['deadline'] = datetime.now().strftime("%d/%m/%Y")
+            return {
+                "success": True,
+                "data": cached,
+                "from_cache": True
+            }
+        
+        # Se não encontrou no cache, consulta Yan Buscas
+        print(f"[CPFService] CPF não encontrado no cache, consultando Yan Buscas...")
         resultado = await yan_buscas_service.consultar_cpf(cpf_clean)
         
         if not resultado['success']:
@@ -92,11 +109,49 @@ class CPFService:
         # Gera protocolo consistente
         protocol = CPFService.gerar_protocolo(cpf_clean)
         
-        # Define status baseado em algum critério (exemplo: CPFs pares são irregulares)
+        # Define status baseado em algum critério
         ultimo_digito = int(cpf_clean[-1])
         status = "IRREGULAR" if ultimo_digito % 2 == 0 else "REGULAR"
         declaration = "NÃO ENTREGUE" if status == "IRREGULAR" else "ENTREGUE"
         status_type = "CRÍTICO" if status == "IRREGULAR" else "NORMAL"
+        
+        # Prazo é HOJE
+        prazo_final = datetime.now().strftime("%d/%m/%Y")
+        
+        documento = {
+            "cpf": cpf_formatado,
+            "name": nome,
+            "birthDate": data_nascimento,
+            "status": status,
+            "declaration2023": declaration,
+            "protocol": protocol,
+            "deadline": prazo_final,
+            "statusType": status_type,
+            "consulted_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Salvar no cache para próximas consultas
+        try:
+            await mongo_db.cpf_cache.insert_one(documento.copy())
+            print(f"[CPFService] ✓ CPF salvo no cache")
+        except Exception as e:
+            print(f"[CPFService] Aviso: Não foi possível salvar no cache: {e}")
+        
+        return {
+            "success": True,
+            "data": {
+                "name": nome,
+                "cpf": cpf_formatado,
+                "birthDate": data_nascimento,
+                "status": status,
+                "declaration2023": declaration,
+                "protocol": protocol,
+                "deadline": prazo_final,
+                "statusType": status_type
+            },
+            "from_cache": False
+        }
         
         # Prazo é HOJE
         prazo_final = datetime.now().strftime("%d/%m/%Y")
