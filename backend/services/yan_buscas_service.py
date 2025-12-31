@@ -25,7 +25,7 @@ class YanBuscasService:
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.chromium.launch(
             headless=True,
-            channel='chromium',
+            executable_path='/pw-browsers/chromium-1200/chrome-linux/chrome',
             args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
         )
         self.page = await self.browser.new_page()
