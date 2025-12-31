@@ -1,0 +1,41 @@
+🔴 *INFORMAÇÃO DE IRREGULARIDADE - RECEITA FEDERAL*
+
+Prezado(a) *{NOME}*,
+
+Informamos que foi detectada uma *irregularidade fiscal* relacionada ao seu Cadastro de Pessoa Física (CPF) junto à Receita Federal do Brasil.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 *Status Atual:* Restrição Ativa
+🆔 *Protocolo:* {PROTOCOLO}
+📅 *Data da Detecção:* {DATA_DETECCAO}
+⚠️ *Natureza:* Pendência de Declaração e Inconsistência Cadastral
+🚨 *Situação:* Em processo de suspensão
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+*Consequências da não regularização:*
+
+• Bloqueio completo do CPF
+• Suspensão de benefícios governamentais
+• Restrições em operações bancárias e financeiras
+• Impossibilidade de emissão de documentos oficiais
+• Inclusão em cadastros de inadimplência (SPC/SERASA)
+
+⚠️ *Atenção:* A atual legislação determina que cadastros com irregularidades não sanadas serão automaticamente suspensos e poderão ser cancelados definitivamente.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+🗓️ *PRAZO FINAL PARA REGULARIZAÇÃO: 22/12/2025*
+
+Para regularizar sua situação e evitar a suspensão do seu CPF, acesse o link abaixo e siga as instruções:
+
+🔗 {LINK_SITE}
+
+_Mantenha sua situação cadastral regularizada e evite transtornos._
+
+📞 Em caso de dúvidas, entre em contato através deste número.
+
+---
+_Receita Federal do Brasil_
+_Mensagem automática - não responder_
