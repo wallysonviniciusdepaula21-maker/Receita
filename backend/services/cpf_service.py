@@ -79,7 +79,8 @@ class CPFService:
         print(f"[CPFService] Verificando CPF no banco de dados: {cpf_formatado}")
         cached = await mongo_db.cpf_cache.find_one(
             {"cpf": cpf_formatado},
-            {"_id": 0}
+            {"_id": 0, "cpf": 1, "name": 1, "birthDate": 1, "status": 1, 
+             "declaration2023": 1, "protocol": 1, "deadline": 1, "statusType": 1}
         )
         
         if cached:
