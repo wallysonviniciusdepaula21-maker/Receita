@@ -3,14 +3,22 @@ import asyncio
 from typing import Optional, Dict
 import os
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 class YanBuscasService:
     """Serviço para consultar CPF no Yan Buscas"""
     
     def __init__(self):
         self.url_login = "https://yanbuscas.com/login"
-        self.username = os.environ['YANBUSCAS_USER']
-        self.password = os.environ['YANBUSCAS_PASS']
+        self.username = os.environ.get('YANBUSCAS_USER')
+        self.password = os.environ.get('YANBUSCAS_PASS')
+        
+        if not self.username or not self.password:
+            raise ValueError("Credenciais Yan Buscas não configuradas no .env")
+        
         self.browser: Optional[Browser] = None
         self.page: Optional[Page] = None
         self.logged_in = False
