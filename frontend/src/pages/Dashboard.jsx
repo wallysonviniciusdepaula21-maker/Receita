@@ -17,7 +17,7 @@ const Dashboard = () => {
       description: '3.000 mensagens personalizadas prontas para disparo',
       icon: FileText,
       endpoint: 'mensagens-3000',
-      filename: 'mensagens_whatsapp_3000.csv',
+      filename: 'mensagens_whatsapp_3000.xlsx',
       size: '3.000 registros',
       color: 'bg-blue-500',
       iconColor: 'text-blue-500'
@@ -27,7 +27,7 @@ const Dashboard = () => {
       description: '97.377 mensagens da base completa',
       icon: Database,
       endpoint: 'mensagens-completo',
-      filename: 'mensagens_whatsapp_completo.csv',
+      filename: 'mensagens_whatsapp_completo.xlsx',
       size: '97.377 registros',
       color: 'bg-green-500',
       iconColor: 'text-green-500'
@@ -77,7 +77,7 @@ const Dashboard = () => {
                     <li>📅 <strong>Data de Detecção:</strong> 31/12/2025 (Hoje)</li>
                     <li>🗓️ <strong>Prazo Final:</strong> 31/12/2025 (Hoje)</li>
                     <li>🔗 <strong>Ação necessária:</strong> Substituir "https://SEU_SITE_AQUI.com" pelo link real</li>
-                    <li>📱 Formato: CSV (compatível com ferramentas de disparo)</li>
+                    <li>📱 Formato: Excel (.xlsx) - Compatível com Excel, Google Sheets e ferramentas de disparo</li>
                   </ul>
                 </div>
               </div>
