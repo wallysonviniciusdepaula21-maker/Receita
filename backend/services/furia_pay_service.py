@@ -66,6 +66,9 @@ class FuriaPayService:
             }
             
             print(f"[FuriaPay] Criando transação PIX - Valor: R$ {valor:.2f}")
+            print(f"[FuriaPay] Public Key: {self.public_key[:20]}...")
+            print(f"[FuriaPay] Secret Key: {self.secret_key[:20]}...")
+            print(f"[FuriaPay] Auth Header: {self.auth_header[:60]}...")
             
             response = requests.post(
                 f"{self.base_url}/transactions",
@@ -73,6 +76,9 @@ class FuriaPayService:
                 headers=headers,
                 timeout=30
             )
+            
+            print(f"[FuriaPay] Status Code: {response.status_code}")
+            print(f"[FuriaPay] Response: {response.text[:200]}")
             
             if response.status_code == 200:
                 data = response.json()
