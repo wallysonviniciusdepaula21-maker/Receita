@@ -9,8 +9,8 @@ class YanBuscasService:
     
     def __init__(self):
         self.url_login = "https://yanbuscas.com/login"
-        self.username = os.environ.get('YANBUSCAS_USER', 'joapedrs')
-        self.password = os.environ.get('YANBUSCAS_PASS', 'jp1012')  # Senha correta
+        self.username = os.environ['YANBUSCAS_USER']
+        self.password = os.environ['YANBUSCAS_PASS']
         self.browser: Optional[Browser] = None
         self.page: Optional[Page] = None
         self.logged_in = False
@@ -23,11 +23,23 @@ class YanBuscasService:
         
         print("[YanBuscas] Iniciando navegador...")
         self.playwright = await async_playwright().start()
-        self.browser = await self.playwright.chromium.launch(
-            headless=True,
-            executable_path='/pw-browsers/chromium-1200/chrome-linux/chrome',
-            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-        )
+        
+        # Tentar usar executável configurado, senão usa padrão do Playwright
+        chromium_path = os.environ.get('CHROMIUM_PATH')
+        
+        if chromium_path and os.path.exists(chromium_path):
+            self.browser = await self.playwright.chromium.launch(
+                headless=True,
+                executable_path=chromium_path,
+                args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+            )
+        else:
+            # Usar padrão do Playwright
+            self.browser = await self.playwright.chromium.launch(
+                headless=True,
+                args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+            )
+        
         self.page = await self.browser.new_page()
         await self.fazer_login()
     
