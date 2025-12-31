@@ -153,9 +153,6 @@ class CPFService:
             "from_cache": False
         }
         
-        # Prazo é HOJE
-        prazo_final = datetime.now().strftime("%d/%m/%Y")
-        
         return {
             "success": True,
             "data": {
@@ -167,5 +164,6 @@ class CPFService:
                 "protocol": protocol,
                 "deadline": prazo_final,
                 "statusType": status_type
-            }
+            },
+            "from_cache": False
         }
