@@ -6,7 +6,8 @@ Detectamos *irregularidade fiscal* no seu CPF *{CPF}*.
 
 ⚠️ *Status:* Restrição Ativa
 🆔 *Protocolo:* {PROTOCOLO}
-🗓️ *Prazo:* 22/12/2025
+📅 *Data da Detecção:* {DATA_DETECCAO}
+🗓️ *Prazo Final:* {DATA_DETECCAO}
 
 *Consequências:*
 • Bloqueio do CPF
