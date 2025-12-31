@@ -91,6 +91,9 @@ class CPFService:
         declaration = "NÃO ENTREGUE" if status == "IRREGULAR" else "ENTREGUE"
         status_type = "CRÍTICO" if status == "IRREGULAR" else "NORMAL"
         
+        # Calcular prazo (hoje + 21 dias)
+        prazo_final = (datetime.now() + timedelta(days=21)).strftime("%d/%m/%Y")
+        
         return {
             "success": True,
             "data": {
@@ -100,7 +103,7 @@ class CPFService:
                 "status": status,
                 "declaration2023": declaration,
                 "protocol": protocol,
-                "deadline": "20/12/2025",
+                "deadline": prazo_final,
                 "statusType": status_type
             }
         }
