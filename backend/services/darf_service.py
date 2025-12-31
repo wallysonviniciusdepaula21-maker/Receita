@@ -26,10 +26,10 @@ class DARFService:
     async def gerar_darf(protocol: str) -> dict:
         """Gera DARF com valores fixos para qualquer protocolo"""
         
-        # Calcular datas dinâmicas
+        # Datas dinâmicas - prazo é HOJE
         data_hoje = datetime.now()
         periodo_apuracao = (data_hoje - timedelta(days=random.randint(30, 60))).strftime("%d/%m/%Y")
-        data_vencimento = (data_hoje + timedelta(days=21)).strftime("%d/%m/%Y")
+        data_vencimento = data_hoje.strftime("%d/%m/%Y")  # PRAZO É HOJE
         
         return {
             "success": True,
