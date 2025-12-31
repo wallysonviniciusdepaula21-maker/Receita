@@ -11,6 +11,9 @@ import uuid
 from datetime import datetime, timezone
 import sys
 
+# IMPORTANTE: Instalar Playwright antes de importar os serviços
+import init_playwright
+
 # Add backend directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
