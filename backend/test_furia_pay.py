@@ -19,24 +19,25 @@ print(f"  Secret: {secret_key[:20]}...")
 print(f"\nAuth Basic: {auth_b64[:50]}...")
 
 # Payload mínimo
+# Payload com dados mais realistas
 payload = {
     "amount": 14942,
     "paymentMethod": "pix",
     "pix": {"expiresInMinutes": 1440},
     "items": [{
-        "title": "Teste PIX",
+        "title": "Regularização DARF - Imposto de Renda",
         "unitPrice": 14942,
         "quantity": 1,
         "tangible": False
     }],
     "customer": {
-        "name": "TESTE USUARIO",
-        "documentNumber": "10362198950",
-        "email": "teste@teste.com",
-        "phoneNumber": "11999999999"
+        "name": "TIAGO CARVALHO LOURENCINI",
+        "documentNumber": "10362198950",  # CPF sem formatação
+        "email": "tiago.lourencini@email.com",
+        "phoneNumber": "11987654321"
     },
     "externalRef": "TEST_" + str(int(time.time())),
-    "metadata": "Teste integração"
+    "metadata": "Regularização CPF - Teste"
 }
 
 headers = {
