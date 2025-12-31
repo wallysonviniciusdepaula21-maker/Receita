@@ -7,14 +7,14 @@ router = APIRouter(prefix="/download", tags=["Download"])
 @router.get("/mensagens-3000")
 async def download_mensagens_3000():
     """Download do arquivo com 3000 mensagens em Excel"""
-    file_path = "/app/mensagens_3000.xlsx"
+    file_path = "/app/mensagens_3000_PRONTO.xlsx"
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Arquivo não encontrado")
     
     return FileResponse(
         path=file_path,
-        filename="mensagens_whatsapp_3000.xlsx",
+        filename="mensagens_whatsapp_3000_PRONTO.xlsx",
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 

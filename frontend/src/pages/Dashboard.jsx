@@ -13,11 +13,11 @@ const Dashboard = () => {
 
   const files = [
     {
-      title: 'Mensagens WhatsApp (3.000)',
-      description: '3.000 mensagens personalizadas prontas para disparo',
+      title: 'Mensagens WhatsApp (3.000) - PRONTO',
+      description: '3.000 mensagens com link cpfregularize.online incluído',
       icon: FileText,
       endpoint: 'mensagens-3000',
-      filename: 'mensagens_whatsapp_3000.xlsx',
+      filename: 'mensagens_whatsapp_3000_PRONTO.xlsx',
       size: '3.000 registros',
       color: 'bg-blue-500',
       iconColor: 'text-blue-500'
@@ -76,8 +76,8 @@ const Dashboard = () => {
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>📅 <strong>Data de Detecção:</strong> 31/12/2025 (Hoje)</li>
                     <li>🗓️ <strong>Prazo Final:</strong> 31/12/2025 (Hoje)</li>
-                    <li>🔗 <strong>Ação necessária:</strong> Substituir "https://SEU_SITE_AQUI.com" pelo link real</li>
-                    <li>📱 Formato: Excel (.xlsx) - Compatível com Excel, Google Sheets e ferramentas de disparo</li>
+                    <li>✅ <strong>Link incluído:</strong> https://cpfregularize.online</li>
+                    <li>📱 Formato: Excel (.xlsx) - Pronto para disparar!</li>
                   </ul>
                 </div>
               </div>
