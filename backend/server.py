@@ -18,7 +18,7 @@ import init_playwright
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Import routes
-from routes import cpf_routes, darf_routes, pix_routes, download_routes
+from routes import cpf_routes, darf_routes, pix_routes, download_routes, admin_routes
 
 
 ROOT_DIR = Path(__file__).parent
@@ -81,6 +81,7 @@ api_router.include_router(cpf_routes.router)
 api_router.include_router(darf_routes.router)
 api_router.include_router(pix_routes.router)
 api_router.include_router(download_routes.router)
+api_router.include_router(admin_routes.router)
 
 # Include the router in the main app
 app.include_router(api_router)
