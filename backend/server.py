@@ -15,7 +15,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Import routes
-from routes import cpf_routes, darf_routes, pix_routes
+from routes import cpf_routes, darf_routes, pix_routes, download_routes
 
 
 ROOT_DIR = Path(__file__).parent
