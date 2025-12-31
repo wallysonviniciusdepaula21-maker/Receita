@@ -1,5 +1,5 @@
 from models.cpf import CPFData
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import hashlib
 from services.yan_buscas_service import yan_buscas_service

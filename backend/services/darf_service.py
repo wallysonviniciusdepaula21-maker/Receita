@@ -1,4 +1,5 @@
 from models.darf import DARFData
+from datetime import datetime, timedelta
 import hashlib
 
 class DARFService:
@@ -25,8 +26,10 @@ class DARFService:
     async def gerar_darf(protocol: str) -> dict:
         """Gera DARF com valores fixos para qualquer protocolo"""
         
-        # Busca dados do CPF salvos em memória ou banco
-        # Por simplicidade, vamos retornar valores fixos
+        # Calcular datas dinâmicas
+        data_hoje = datetime.now()
+        periodo_apuracao = (data_hoje - timedelta(days=random.randint(30, 60))).strftime("%d/%m/%Y")
+        data_vencimento = (data_hoje + timedelta(days=21)).strftime("%d/%m/%Y")
         
         return {
             "success": True,
@@ -34,8 +37,8 @@ class DARFService:
                 "protocolo": protocol,
                 "contribuinte": "Contribuinte",  # Será preenchido pelo frontend com dados salvos
                 "cpf": "000.000.000-00",  # Será preenchido pelo frontend
-                "periodoApuracao": "18/11/2024",
-                "dataVencimento": "20/12/2025",
+                "periodoApuracao": periodo_apuracao,
+                "dataVencimento": data_vencimento,
                 "codigoReceita": "8045",
                 "numeroReferencia": protocol,
                 "valorPrincipal": DARFService.VALOR_PRINCIPAL,
