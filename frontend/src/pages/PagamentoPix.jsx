@@ -103,23 +103,56 @@ const PagamentoPix = () => {
     return () => clearInterval(interval);
   }, [paymentData, toast]);
 
-  const handleCopyPix = () => {
+  const handleCopyPix = async () => {
     if (!paymentData) return;
     
-    navigator.clipboard.writeText(paymentData.pixCode).then(() => {
-      setCopied(true);
-      toast({
-        title: "Código PIX copiado!",
-        description: "Cole no aplicativo do seu banco para pagar.",
-      });
-      setTimeout(() => setCopied(false), 3000);
-    }).catch(() => {
+    // Método 1: Clipboard API (moderno)
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(paymentData.pixCode);
+        setCopied(true);
+        toast({
+          title: "Código PIX copiado!",
+          description: "Cole no aplicativo do seu banco para pagar.",
+        });
+        setTimeout(() => setCopied(false), 3000);
+        return;
+      } catch (err) {
+        console.log('Clipboard API falhou, tentando fallback...');
+      }
+    }
+    
+    // Método 2: Fallback usando textarea temporário
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = paymentData.pixCode;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        setCopied(true);
+        toast({
+          title: "Código PIX copiado!",
+          description: "Cole no aplicativo do seu banco para pagar.",
+        });
+        setTimeout(() => setCopied(false), 3000);
+      } else {
+        throw new Error('execCommand falhou');
+      }
+    } catch (err) {
       toast({
         title: "Erro ao copiar",
-        description: "Não foi possível copiar o código. Tente manualmente.",
+        description: "Por favor, copie o código manualmente.",
         variant: "destructive"
       });
-    });
+    }
   };
 
   const formatCurrency = (value) => {
