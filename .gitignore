@@ -80,3 +80,7 @@ agenthub/agents/youtube/db
 android-sdk/ -e 
 # Keep .env files for deployment
 # Note: Sensitive data managed via Emergent platform
+-e 
+# Environment files
+*.env
+*.env.*
